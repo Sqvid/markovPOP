@@ -92,6 +92,18 @@ State* lookup(char* prefixes[nPrefix], _Bool create) {
 	return sp;
 }
 
+char* strDuplicate(const char* str) {
+	char* dup = malloc(strlen(str) + 1);
+	if (!dup) {
+		fprintf(stderr, "Error: Failed to allocate memory for string!\n");
+		exit(1);
+	}
+
+	strcpy(dup, str);
+
+	return dup;
+}
+
 void add(char* prefixes[nPrefix], char* suffix) {
 	State* sp = lookup(prefixes, true);
 
@@ -103,7 +115,7 @@ void add(char* prefixes[nPrefix], char* suffix) {
 		exit(1);
 	}
 
-	char* suffstr = strdup(suffix);
+	char* suffstr = strDuplicate(suffix);
 
 	if (!suffstr) {
 		fprintf(stderr, "Error: String duplication failed!\n");
@@ -165,7 +177,7 @@ int main(void) {
 		prefixes[i] = NONWORD;
 	}
 
-	srand(time(0));
+	srand((unsigned int) time(NULL));
 	build(prefixes, stdin);
 	generate();
 
