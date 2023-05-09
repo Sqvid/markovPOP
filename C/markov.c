@@ -171,8 +171,8 @@ void generate(void) {
 	}
 }
 
-// Dealloce memory within the state-table. States, Suffixes, and suffix-strings
-// need to be freed.
+// Deallocate memory within the state-table. States, Suffixes, and
+// suffix-strings need to be freed.
 void cleanup() {
 	for (int i = 0; i < hashTblSize; ++i) {
 		State* sp = stateTbl[i];
