@@ -36,14 +36,10 @@ func main() {
 		// The prefix key in the state-table is just the concatination of the
 		// prefix strings.
 		key := strings.Join(prefixes, "")
-
-		suffixList := st[key]
-		suffixList = append(suffixList, suffix)
-		st[key] = suffixList
+		st[key] = append(st[key], suffix)
 
 		// Move the prefix window, and add the suffix.
-		prefixes = prefixes[1:]
-		prefixes = append(prefixes, suffix)
+		prefixes = append(prefixes[1:], suffix)
 	}
 
 	// Reset prefixes to sentinel values to indicate the beginning of the
@@ -61,8 +57,7 @@ func main() {
 			suffix := suffixes[rand.Intn(len(suffixes))]
 			fmt.Printf("%s ", suffix)
 
-			prefixes = prefixes[1:]
-			prefixes = append(prefixes, suffix)
+			prefixes = append(prefixes[1:], suffix)
 
 		} else {
 			break
