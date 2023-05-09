@@ -92,6 +92,7 @@ State* lookup(char* prefixes[nPrefix], _Bool create) {
 	return sp;
 }
 
+// Make duplicate of a string on the heap and return a pointer to it.
 char* strDuplicate(const char* str) {
 	char* dup = malloc(strlen(str) + 1);
 	if (!dup) {
@@ -170,18 +171,48 @@ void generate(void) {
 	}
 }
 
+// Dealloce memory within the state-table. States, Suffixes, and suffix-strings
+// need to be freed.
+void cleanup() {
+	for (int i = 0; i < hashTblSize; ++i) {
+		State* sp = stateTbl[i];
+
+		// Free the state list.
+		while (sp) {
+			State* stateNext = sp->next;
+			Suffix* suffp = sp->suffix;
+
+			// Free the suffix list.
+			while (suffp) {
+				Suffix* suffNext = suffp->next;
+
+				// Free the suffix string.
+				free(suffp->word);
+				free(suffp);
+
+				suffp = suffNext;
+			}
+
+			free(sp);
+
+			sp = stateNext;
+		}
+	}
+}
+
 int main(void) {
+	srand((unsigned int) time(NULL));
+
 	char* prefixes[nPrefix];
 
 	for (int i = 0; i < nPrefix; ++i) {
 		prefixes[i] = NONWORD;
 	}
 
-	srand((unsigned int) time(NULL));
 	build(prefixes, stdin);
 	generate();
-
 	printf("\n");
 
+	cleanup();
 	return 0;
 }
