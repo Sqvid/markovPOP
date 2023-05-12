@@ -1,14 +1,11 @@
-#include <cstddef>
-#include <fstream>
-#include <istream>
-#include <unordered_map>
-#include <string>
-#include <vector>
 #include <iostream>
+#include <istream>
 #include <random>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 constexpr int nPrefix = 2;
-constexpr int maxOutput = 200;
 
 class StateTable {
 	public:
@@ -17,8 +14,6 @@ class StateTable {
 
 		// Generate the next word.
 		std::string nextWord();
-
-
 
 	private:
 		// The state-table.
@@ -105,6 +100,7 @@ std::string StateTable::nextWord() {
 
 int main() {
 	StateTable st(std::cin);
+	const int maxOutput = 200;
 
 	for (int i = 0; i < maxOutput; ++i) {
 		auto word = st.nextWord();
