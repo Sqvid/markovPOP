@@ -5,17 +5,18 @@
 #include <unordered_map>
 #include <vector>
 
-constexpr int nPrefix = 2;
-
 class StateTable {
 	public:
 		// Build the state-table from an input stream.
-		explicit StateTable(std::istream& in);
+		explicit StateTable(std::istream& in, int nPrefix = 2);
 
 		// Generate the next word.
 		std::string nextWord();
 
 	private:
+		// Size of the prefix window.
+		int nPrefix_;
+
 		// The state-table.
 		std::unordered_map<std::string, std::vector<std::string>> st_;
 		// The prefix window.
@@ -54,10 +55,10 @@ std::string joinStringVec(std::vector<std::string> vec) {
 }
 
 // Build the state-table from an input stream.
-StateTable::StateTable(std::istream& in) : rng_(rd_()) {
+StateTable::StateTable(std::istream& in, int nPrefix) : nPrefix_(nPrefix), rng_(rd_()) {
 	std::string word;
 
-	for (int i = 0; i < nPrefix; ++i) {
+	for (int i = 0; i < nPrefix_; ++i) {
 		prefixes_.push_back("\n");
 	}
 
@@ -71,11 +72,12 @@ StateTable::StateTable(std::istream& in) : rng_(rd_()) {
 	}
 
 	prefixes_.clear();
-	for (int i = 0; i < nPrefix; ++i) {
+	for (int i = 0; i < nPrefix_; ++i) {
 		prefixes_.push_back("\n");
 	}
 }
 
+// Return the next word in the Markov chain.
 std::string StateTable::nextWord() {
 	auto key = joinStringVec(prefixes_);
 	auto search = st_.find(key);
