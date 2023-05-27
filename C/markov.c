@@ -26,6 +26,42 @@ typedef struct State {
 
 State* stateTbl[hashTblSize];
 
+// Deallocate memory within the state-table. States, Suffixes, and
+// suffix-strings need to be freed.
+void cleanup() {
+	for (int i = 0; i < hashTblSize; ++i) {
+		State* sp = stateTbl[i];
+
+		// Free the state list.
+		while (sp) {
+			State* stateNext = sp->next;
+			Suffix* suffp = sp->suffix;
+
+			// Free the suffix list.
+			while (suffp) {
+				Suffix* suffNext = suffp->next;
+
+				// Free the suffix string.
+				free(suffp->word);
+				free(suffp);
+
+				suffp = suffNext;
+			}
+
+			free(sp);
+
+			sp = stateNext;
+		}
+	}
+}
+
+// Graceful exit helper function.
+void gExit(const char* msg, int retCode) {
+	cleanup();
+	fprintf(stderr, "%s", msg);
+	exit(retCode);
+}
+
 // Generate hash of prefixes.
 unsigned int hash(char* prefixes[nPrefix]) {
 	unsigned int hashVal = 0;
@@ -76,8 +112,7 @@ State* lookup(char* prefixes[nPrefix], _Bool create) {
 		sp = malloc(sizeof(State));
 
 		if (!sp) {
-			fprintf(stderr, "Error: Memory allocation failed!\n");
-			exit(1);
+			gExit("Error: Memory allocation failed!\n", 1);
 		}
 
 		for (int i = 0; i < nPrefix; ++i) {
@@ -96,8 +131,7 @@ State* lookup(char* prefixes[nPrefix], _Bool create) {
 char* strDuplicate(const char* str) {
 	char* dup = malloc(strlen(str) + 1);
 	if (!dup) {
-		fprintf(stderr, "Error: Failed to allocate memory for string!\n");
-		exit(1);
+		gExit("Error: Failed to allocate memory for string!\n", 1);
 	}
 
 	strcpy(dup, str);
@@ -112,14 +146,13 @@ void add(char* prefixes[nPrefix], char* suffix) {
 	Suffix* suff = malloc(sizeof(Suffix));
 
 	if (!suff) {
-		fprintf(stderr, "Error: Memory allocation failed!\n");
-		exit(1);
+		gExit("Error: Memory allocation failed!\n", 1);
 	}
 
 	char* suffstr = strDuplicate(suffix);
 
 	if (!suffstr) {
-		fprintf(stderr, "Error: String duplication failed!\n");
+		gExit("Error: String duplication failed!\n", 1);
 	}
 
 	suff->word = suffstr;
@@ -168,35 +201,6 @@ void generate(void) {
 
 		memmove(prefixes, prefixes + 1, (nPrefix - 1) * sizeof(prefixes[0]));
 		prefixes[nPrefix - 1] = word;
-	}
-}
-
-// Deallocate memory within the state-table. States, Suffixes, and
-// suffix-strings need to be freed.
-void cleanup() {
-	for (int i = 0; i < hashTblSize; ++i) {
-		State* sp = stateTbl[i];
-
-		// Free the state list.
-		while (sp) {
-			State* stateNext = sp->next;
-			Suffix* suffp = sp->suffix;
-
-			// Free the suffix list.
-			while (suffp) {
-				Suffix* suffNext = suffp->next;
-
-				// Free the suffix string.
-				free(suffp->word);
-				free(suffp);
-
-				suffp = suffNext;
-			}
-
-			free(sp);
-
-			sp = stateNext;
-		}
 	}
 }
 
